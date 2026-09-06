@@ -5,3 +5,6 @@ dist
 .nitro
 .vinxi
 *.log
+.vercel
+.nitro
+node_modules/.nitro
