@@ -1,0 +1,238 @@
+@import "tailwindcss";
+
+@theme {
+  --color-bg: #050506;
+  --color-surface: #0c0d10;
+  --color-elevated: #14151a;
+  --color-fg: #f4f4f2;
+  --color-muted: #8b8d96;
+  --color-subtle: #6a6c75;
+  --color-line: #22232a;
+  --color-accent: #eceae4;
+  --color-accent-fg: #050506;
+  --color-neural: #9ec9d4;
+  --color-series-lucien: #c5e6f5;
+  --color-series-generic: #6d727c;
+  --color-series-trad: #a8886c;
+
+  --font-sans: "Instrument Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Cormorant Garamond", "Times New Roman", ui-serif, serif;
+
+  --radius-sm: 8px;
+  --radius-md: 14px;
+  --radius-lg: 22px;
+  --radius-xl: 28px;
+
+  --text-hero: clamp(2.55rem, 1rem + 4.6vw, 4.85rem);
+  --text-hero--line-height: 1.06;
+  --text-display: clamp(2.1rem, 1.1rem + 2.8vw, 3.6rem);
+  --text-display--line-height: 1.12;
+  --text-kicker: 0.6875rem;
+  --text-kicker--line-height: 1.4;
+  --text-kicker--letter-spacing: 0.2em;
+
+  --ease-smooth: cubic-bezier(0.22, 1, 0.36, 1);
+  --duration-fast: 250ms;
+  --duration-panel: 350ms;
+}
+
+@layer base {
+  html {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    background: var(--color-bg);
+    color: var(--color-fg);
+    scroll-behavior: smooth;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+  }
+
+  body {
+    background: var(--color-bg);
+    color: var(--color-fg);
+    font-family: var(--font-sans);
+  }
+
+  button:not(:disabled),
+  [role="button"]:not(:disabled) {
+    cursor: pointer;
+  }
+
+  ::selection {
+    background: var(--color-fg);
+    color: var(--color-bg);
+  }
+
+  h1,
+  h2,
+  h3 {
+    text-wrap: balance;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+}
+
+@utility kicker {
+  font-family: var(--font-sans);
+  font-size: var(--text-kicker);
+  letter-spacing: var(--text-kicker--letter-spacing);
+  text-transform: uppercase;
+  font-weight: 500;
+  color: var(--color-muted);
+}
+
+@utility veil-bottom {
+  background: linear-gradient(to top, var(--color-bg) 0%, transparent 42%);
+}
+
+@utility veil-left {
+  background: linear-gradient(to right, var(--color-bg) 0%, transparent 38%);
+}
+
+@utility veil-cinema {
+  background: linear-gradient(
+    to bottom,
+    color-mix(in oklab, var(--color-bg) 48%, transparent) 0%,
+    transparent 22%,
+    transparent 100%
+  );
+}
+
+@utility veil-into {
+  background: linear-gradient(to bottom, transparent, var(--color-bg));
+}
+
+@utility veil-photo {
+  background: linear-gradient(to top, var(--color-bg) 0%, transparent 48%);
+}
+
+@utility veil-card {
+  background: linear-gradient(
+    to top,
+    color-mix(in oklab, var(--color-bg) 92%, transparent) 0%,
+    color-mix(in oklab, var(--color-bg) 22%, transparent) 55%,
+    color-mix(in oklab, var(--color-bg) 18%, transparent) 100%
+  );
+}
+
+.nav-safe {
+  padding-top: env(safe-area-inset-top);
+}
+
+.year-range {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 44px;
+  border-radius: 999px;
+  background: transparent;
+  outline: none;
+}
+
+.year-range::-webkit-slider-runnable-track {
+  height: 2px;
+  border-radius: 999px;
+  background: color-mix(in oklab, var(--color-fg) 16%, transparent);
+}
+
+.year-range::-moz-range-track {
+  height: 2px;
+  border-radius: 999px;
+  background: color-mix(in oklab, var(--color-fg) 16%, transparent);
+}
+
+.year-range::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 14px;
+  height: 14px;
+  border-radius: 999px;
+  background: var(--color-fg);
+  border: 0;
+  cursor: pointer;
+}
+
+.year-range::-moz-range-thumb {
+  width: 14px;
+  height: 14px;
+  border-radius: 999px;
+  background: var(--color-fg);
+  border: 0;
+  cursor: pointer;
+}
+
+.year-range:focus-visible::-webkit-slider-thumb {
+  outline: 2px solid color-mix(in oklab, var(--color-fg) 50%, transparent);
+  outline-offset: 3px;
+}
+
+.shimmer {
+  background: linear-gradient(
+    90deg,
+    var(--color-muted) 0%,
+    var(--color-fg) 45%,
+    var(--color-muted) 100%
+  );
+  background-size: 200% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: shimmer 1.6s linear infinite;
+}
+
+@keyframes shimmer {
+  from {
+    background-position: 100% 0;
+  }
+  to {
+    background-position: -100% 0;
+  }
+}
+
+@keyframes ken {
+  from {
+    transform: scale(1.04);
+  }
+  to {
+    transform: scale(1.1);
+  }
+}
+
+.ken {
+  animation: ken 22s ease-in-out alternate infinite;
+  transform-origin: center;
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.rise {
+  animation: rise 700ms var(--ease-smooth) both;
+}
+
+.rise-late {
+  animation: rise 700ms var(--ease-smooth) 120ms both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .shimmer,
+  .ken,
+  .rise,
+  .rise-late {
+    animation: none;
+  }
+}
