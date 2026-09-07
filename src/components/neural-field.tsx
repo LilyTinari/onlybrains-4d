@@ -36,17 +36,20 @@ const vertexShader = /* glsl */ `
     p.y += (1.0 - ease) * (aSeed - 0.5) * 2.8;
 
     float radial = length(home);
-    float fire = pow(max(0.0, sin(uTime * 1.55 + aSeed * 42.0)), 12.0);
+    float fire = pow(max(0.0, sin(uTime * 1.55 + aSeed * 42.0)), 16.0);
     float waveR = fract(uTime * 0.11) * 3.6;
-    float wave = exp(-abs(radial - waveR) * 5.2) * ease;
+    float wave = exp(-abs(radial - waveR) * 6.4) * ease * 0.35;
     float radialReveal = smoothstep(uDensity * 1.2 + 0.22, uDensity * 0.35, radial / 4.4);
-    vAlpha = twinkle * mix(0.42, 1.0, uDensity) * mix(0.28, 1.0, radialReveal) * uIntro;
-    vAlpha *= 1.0 + fire * 1.7 + wave * 1.35;
-    vColor = mix(vColor, vec3(0.92, 0.97, 1.0), clamp(fire * 0.55 + wave * 0.4, 0.0, 1.0));
+    float coreDim = smoothstep(0.15, 1.15, radial);
+    vAlpha = twinkle * mix(0.32, 0.72, uDensity) * mix(0.22, 0.85, radialReveal) * uIntro;
+    vAlpha *= mix(0.18, 1.0, coreDim);
+    vAlpha *= mix(0.22, 1.0, ease);
+    vAlpha *= 1.0 + fire * 0.55 + wave;
+    vColor = mix(vColor, vec3(0.86, 0.93, 0.96), clamp(fire * 0.22 + wave * 0.18, 0.0, 1.0));
 
     vec4 mvPosition = modelViewMatrix * vec4(p, 1.0);
-    float sizeBoost = mix(0.55, 1.0, ease) * (1.0 + fire * 0.85 + wave * 0.55);
-    gl_PointSize = clamp(aSize * twinkle * uIntro * sizeBoost * (250.0 / -mvPosition.z), 1.0, 86.0);
+    float sizeBoost = mix(0.28, 0.72, ease) * (1.0 + fire * 0.25 + wave * 0.2);
+    gl_PointSize = clamp(aSize * twinkle * uIntro * sizeBoost * (180.0 / -mvPosition.z), 1.0, 22.0);
     gl_Position = projectionMatrix * mvPosition;
   }
 `;
@@ -88,11 +91,11 @@ const synapseFrag = /* glsl */ `
   varying float vAlpha;
   void main() {
     float pulse = fract(uTime * 0.19 + vSeed);
-    float spark = smoothstep(0.12, 0.0, abs(vAlong - pulse));
-    float trail = smoothstep(0.28, 0.0, mod(vAlong - pulse + 1.0, 1.0));
-    float base = 0.1 + 0.06 * sin(uTime * 2.1 + vSeed * 9.0);
-    float a = (base + spark * 0.9 + trail * 0.28) * vAlpha;
-    vec3 col = mix(vec3(0.72, 0.82, 0.86), vec3(0.95, 0.98, 1.0), spark);
+    float spark = smoothstep(0.08, 0.0, abs(vAlong - pulse));
+    float trail = smoothstep(0.22, 0.0, mod(vAlong - pulse + 1.0, 1.0));
+    float base = 0.06 + 0.03 * sin(uTime * 2.1 + vSeed * 9.0);
+    float a = (base + spark * 0.35 + trail * 0.12) * vAlpha;
+    vec3 col = mix(vec3(0.62, 0.74, 0.78), vec3(0.82, 0.9, 0.93), spark);
     gl_FragColor = vec4(col, a);
   }
 `;
@@ -111,7 +114,7 @@ const sparkVert = /* glsl */ `
     vec3 p = mix(aStart, aEnd, t);
     vGlow = ease * uGather;
     vec4 mv = modelViewMatrix * vec4(p, 1.0);
-    gl_PointSize = clamp((5.5 + ease * 9.0) * (220.0 / -mv.z), 1.0, 28.0);
+    gl_PointSize = clamp((2.4 + ease * 3.2) * (160.0 / -mv.z), 1.0, 8.0);
     gl_Position = projectionMatrix * mv;
   }
 `;
@@ -123,7 +126,7 @@ const sparkFrag = /* glsl */ `
     float r = dot(uv, uv);
     if (r > 1.0) discard;
     float glow = exp(-r * 2.6);
-    gl_FragColor = vec4(0.93, 0.97, 1.0, glow * vGlow);
+    gl_FragColor = vec4(0.78, 0.88, 0.92, glow * vGlow * 0.45);
   }
 `;
 
@@ -156,7 +159,7 @@ function makeLattice(count: number): LatticeData {
       colors[i * 3] = c.r;
       colors[i * 3 + 1] = c.g;
       colors[i * 3 + 2] = c.b;
-      sizes[i] = 8.5 + seed * 7;
+      sizes[i] = 4.2 + seed * 3.2;
     } else {
       const k = (i - coreCount) / Math.max(count - coreCount, 1);
       const t = Math.pow(k, 0.62);
@@ -429,11 +432,11 @@ function BrainCore() {
     gather.current = Math.min(1, gather.current + Math.min(dt, 0.05) / 2.55);
     const k = 1 - (1 - gather.current) ** 3;
     const t = state.clock.elapsedTime;
-    const pulse = 2.15 + Math.sin(t * 0.9) * 0.08 + Math.sin(t * 2.3) * 0.03;
-    const scale = pulse * (0.35 + 0.65 * k);
+    const pulse = 1.05 + Math.sin(t * 0.9) * 0.03;
+    const scale = pulse * (0.2 + 0.35 * k);
     s.scale.set(scale, scale * 0.92, 1);
     const mat = s.material as THREE.SpriteMaterial;
-    mat.opacity = 0.55 * k * k;
+    mat.opacity = 0.12 * k * k;
   });
 
   return (
@@ -443,7 +446,7 @@ function BrainCore() {
         transparent
         depthWrite={false}
         blending={THREE.AdditiveBlending}
-        opacity={0.55}
+        opacity={0.12}
         toneMapped={false}
       />
     </sprite>

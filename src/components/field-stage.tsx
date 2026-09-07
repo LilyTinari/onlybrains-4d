@@ -37,10 +37,10 @@ export function FieldStage() {
       if (plateRef.current) {
         const scale = 1.22 - 0.12 * k + p * 0.2;
         plateRef.current.style.transform = `translate3d(0, ${p * -7}%, 0) scale(${scale}) rotateX(${pitch + p * 12}deg) rotateY(${yaw}deg)`;
-        plateRef.current.style.opacity = String((0.08 + 0.82 * k) * (1 - p * 0.55));
+        plateRef.current.style.opacity = String((0.55 + 0.45 * k) * (1 - p * 0.55));
       }
       if (fieldRef.current) {
-        fieldRef.current.style.opacity = String((0.55 + 0.45 * k) * (1 - p * 0.84));
+        fieldRef.current.style.opacity = String((0.22 + 0.38 * k) * (1 - p * 0.84));
       }
       raf = requestAnimationFrame(tick);
     };
