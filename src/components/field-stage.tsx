@@ -12,6 +12,10 @@ export function FieldStage() {
   const fieldRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    useAppStore.getState().setOpening(0);
+  }, []);
+
+  useEffect(() => {
     let raf = 0;
     const born = performance.now();
     let lastP = -1;
@@ -24,19 +28,19 @@ export function FieldStage() {
         setProgress(p);
       }
       const st = useAppStore.getState();
-      const intro = reduced ? 1 : Math.min(1, (now - born) / 1900);
+      const intro = reduced ? 1 : Math.min(1, (now - born) / 2600);
       const k = 1 - (1 - intro) ** 3;
       const t = (now - born) / 1000;
       const sway = reduced ? 0 : Math.sin(t * 0.13) * 9;
       const yaw = sway + Math.max(-30, Math.min(30, st.fieldYaw * (180 / Math.PI)));
       const pitch = 8 + Math.max(-14, Math.min(14, st.fieldPitch * (180 / Math.PI)));
       if (plateRef.current) {
-        const scale = 1.16 - 0.14 * k + p * 0.2;
+        const scale = 1.22 - 0.12 * k + p * 0.2;
         plateRef.current.style.transform = `translate3d(0, ${p * -7}%, 0) scale(${scale}) rotateX(${pitch + p * 12}deg) rotateY(${yaw}deg)`;
-        plateRef.current.style.opacity = String((0.4 + 0.6 * k) * (1 - p * 0.55));
+        plateRef.current.style.opacity = String((0.08 + 0.82 * k) * (1 - p * 0.55));
       }
       if (fieldRef.current) {
-        fieldRef.current.style.opacity = String((0.35 + 0.65 * k) * (1 - p * 0.84));
+        fieldRef.current.style.opacity = String((0.55 + 0.45 * k) * (1 - p * 0.84));
       }
       raf = requestAnimationFrame(tick);
     };

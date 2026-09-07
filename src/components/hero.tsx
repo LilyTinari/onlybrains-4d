@@ -113,13 +113,29 @@ export function Hero() {
   const setYear = useAppStore((s) => s.setYear);
   const progress = useAppStore((s) => s.fieldProgress);
   const touched = useAppStore((s) => s.fieldTouched);
+  const opening = useAppStore((s) => s.opening);
   const reduced = usePrefersReducedMotion();
   const labelFade = Math.max(0, 1 - progress * 1.85);
   const hintFade = touched || progress > 0.12 ? 0 : 1;
+  const onlyIn = reduced ? 1 : Math.max(0, Math.min(1, (opening - 0.42) / 0.28));
+  const brainsIn = reduced ? 1 : Math.max(0, Math.min(1, (opening - 0.56) / 0.28));
+  const markIn = reduced ? 1 : Math.max(0, Math.min(1, (opening - 0.28) / 0.22));
 
   return (
     <section id="field" className="relative min-h-svh overflow-hidden">
       <FieldGrab />
+
+      <div
+        className="pointer-events-none absolute inset-x-0 top-[46%] z-20 flex justify-center px-5 md:top-[40%]"
+        style={{
+          opacity: markIn * labelFade * (1 - brainsIn * 0.85),
+          transform: `translateY(${(1 - markIn) * 12}px)`,
+        }}
+      >
+        <p className="font-display text-4xl italic tracking-tight text-fg md:text-6xl lg:text-7xl">
+          OnlyBrains
+        </p>
+      </div>
 
       <div
         className="pointer-events-none absolute inset-x-0 top-1/2 z-20 flex items-center justify-between px-4 md:top-[42%] md:px-16 lg:px-24"
@@ -128,17 +144,29 @@ export function Hero() {
           transform: `translateY(calc(-50% - ${progress * 28}px))`,
         }}
       >
-        <p className="font-display rise text-2xl italic tracking-tight text-fg md:text-5xl lg:text-6xl">
+        <p
+          className="font-display text-2xl italic tracking-tight text-fg md:text-5xl lg:text-6xl"
+          style={{
+            opacity: onlyIn,
+            transform: `translateX(${(1 - onlyIn) * -28}px)`,
+          }}
+        >
           Only
         </p>
-        <p className="rise-late font-sans text-xs font-medium tracking-widest text-fg uppercase md:text-sm">
+        <p
+          className="font-sans text-xs font-medium tracking-widest text-fg uppercase md:text-sm"
+          style={{
+            opacity: brainsIn,
+            transform: `translateX(${(1 - brainsIn) * 28}px)`,
+          }}
+        >
           Brains
         </p>
       </div>
 
       <div
         className="pointer-events-none absolute inset-x-0 top-2/3 z-20 flex justify-center px-5 transition-opacity duration-700 ease-smooth"
-        style={{ opacity: reduced ? 0 : hintFade }}
+        style={{ opacity: reduced ? 0 : hintFade * brainsIn }}
       >
         <p className="kicker rise-late">Drag to orbit</p>
       </div>

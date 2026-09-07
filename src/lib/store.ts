@@ -15,10 +15,12 @@ type AppState = {
   fieldProgress: number;
   fieldDragging: boolean;
   fieldTouched: boolean;
+  opening: number;
   nudgeField: (dx: number, dy: number) => void;
   setFieldDragging: (dragging: boolean) => void;
   setFieldProgress: (progress: number) => void;
   markFieldTouched: () => void;
+  setOpening: (opening: number) => void;
 };
 
 export const useAppStore = create<AppState>((set) => ({
@@ -33,6 +35,7 @@ export const useAppStore = create<AppState>((set) => ({
   fieldProgress: 0,
   fieldDragging: false,
   fieldTouched: false,
+  opening: 0,
   nudgeField: (dx, dy) =>
     set((s) => ({
       fieldYaw: Math.max(-0.85, Math.min(0.85, s.fieldYaw + dx)),
@@ -41,4 +44,5 @@ export const useAppStore = create<AppState>((set) => ({
   setFieldDragging: (fieldDragging) => set({ fieldDragging }),
   setFieldProgress: (fieldProgress) => set({ fieldProgress }),
   markFieldTouched: () => set({ fieldTouched: true }),
+  setOpening: (opening) => set({ opening }),
 }));
