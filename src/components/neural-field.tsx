@@ -23,7 +23,7 @@ const vertexShader = /* glsl */ `
 
   void main() {
     vColor = color;
-    float twinkle = 0.7 + 0.3 * sin(uTime * (1.05 + aSeed * 0.8) + aSeed * 14.0);
+    float twinkle = 0.9 + 0.1 * sin(uTime * (0.7 + aSeed * 0.4) + aSeed * 14.0);
     float gather = clamp(uGather, 0.0, 1.0);
     float ease = gather * gather * (3.0 - 2.0 * gather);
     float scatter = mix(7.4 + aSeed * 8.2, 1.0, ease);
@@ -36,20 +36,15 @@ const vertexShader = /* glsl */ `
     p.y += (1.0 - ease) * (aSeed - 0.5) * 2.8;
 
     float radial = length(home);
-    float fire = pow(max(0.0, sin(uTime * 1.55 + aSeed * 42.0)), 16.0);
-    float waveR = fract(uTime * 0.11) * 3.6;
-    float wave = exp(-abs(radial - waveR) * 6.4) * ease * 0.35;
     float radialReveal = smoothstep(uDensity * 1.2 + 0.22, uDensity * 0.35, radial / 4.4);
-    float coreDim = smoothstep(0.15, 1.15, radial);
-    vAlpha = twinkle * mix(0.32, 0.72, uDensity) * mix(0.22, 0.85, radialReveal) * uIntro;
-    vAlpha *= mix(0.18, 1.0, coreDim);
-    vAlpha *= mix(0.22, 1.0, ease);
-    vAlpha *= 1.0 + fire * 0.55 + wave;
-    vColor = mix(vColor, vec3(0.86, 0.93, 0.96), clamp(fire * 0.22 + wave * 0.18, 0.0, 1.0));
+    float coreDim = smoothstep(0.45, 1.35, radial);
+    vAlpha = twinkle * mix(0.28, 0.58, uDensity) * mix(0.18, 0.7, radialReveal) * uIntro;
+    vAlpha *= mix(0.08, 1.0, coreDim);
+    vAlpha *= mix(0.18, 1.0, ease);
 
     vec4 mvPosition = modelViewMatrix * vec4(p, 1.0);
-    float sizeBoost = mix(0.28, 0.72, ease) * (1.0 + fire * 0.25 + wave * 0.2);
-    gl_PointSize = clamp(aSize * twinkle * uIntro * sizeBoost * (180.0 / -mvPosition.z), 1.0, 22.0);
+    float sizeBoost = mix(0.26, 0.62, ease);
+    gl_PointSize = clamp(aSize * twinkle * uIntro * sizeBoost * (160.0 / -mvPosition.z), 1.0, 14.0);
     gl_Position = projectionMatrix * mvPosition;
   }
 `;
@@ -90,43 +85,11 @@ const synapseFrag = /* glsl */ `
   varying float vSeed;
   varying float vAlpha;
   void main() {
-    float pulse = fract(uTime * 0.19 + vSeed);
-    float spark = smoothstep(0.08, 0.0, abs(vAlong - pulse));
-    float trail = smoothstep(0.22, 0.0, mod(vAlong - pulse + 1.0, 1.0));
-    float base = 0.06 + 0.03 * sin(uTime * 2.1 + vSeed * 9.0);
-    float a = (base + spark * 0.35 + trail * 0.12) * vAlpha;
-    vec3 col = mix(vec3(0.62, 0.74, 0.78), vec3(0.82, 0.9, 0.93), spark);
+    float pulse = fract(uTime * 0.12 + vSeed);
+    float spark = smoothstep(0.06, 0.0, abs(vAlong - pulse));
+    float a = (0.07 + spark * 0.12) * vAlpha;
+    vec3 col = vec3(0.68, 0.78, 0.82);
     gl_FragColor = vec4(col, a);
-  }
-`;
-
-const sparkVert = /* glsl */ `
-  attribute vec3 aStart;
-  attribute vec3 aEnd;
-  attribute float aSeed;
-  uniform float uTime;
-  uniform float uGather;
-  varying float vGlow;
-
-  void main() {
-    float t = fract(uTime * (0.16 + aSeed * 0.12) + aSeed);
-    float ease = smoothstep(0.02, 0.12, t) * (1.0 - smoothstep(0.88, 1.0, t));
-    vec3 p = mix(aStart, aEnd, t);
-    vGlow = ease * uGather;
-    vec4 mv = modelViewMatrix * vec4(p, 1.0);
-    gl_PointSize = clamp((2.4 + ease * 3.2) * (160.0 / -mv.z), 1.0, 8.0);
-    gl_Position = projectionMatrix * mv;
-  }
-`;
-
-const sparkFrag = /* glsl */ `
-  varying float vGlow;
-  void main() {
-    vec2 uv = gl_PointCoord * 2.0 - 1.0;
-    float r = dot(uv, uv);
-    if (r > 1.0) discard;
-    float glow = exp(-r * 2.6);
-    gl_FragColor = vec4(0.78, 0.88, 0.92, glow * vGlow * 0.45);
   }
 `;
 
@@ -151,7 +114,7 @@ function makeLattice(count: number): LatticeData {
       const y = 1 - t * 2;
       const r = Math.sqrt(Math.max(0, 1 - y * y));
       const theta = phi * i;
-      const radius = 0.68 + seed * 0.42;
+      const radius = 0.95 + seed * 0.38;
       positions[i * 3] = Math.cos(theta) * r * radius;
       positions[i * 3 + 1] = y * radius * 1.18;
       positions[i * 3 + 2] = Math.sin(theta) * r * radius;
@@ -159,7 +122,7 @@ function makeLattice(count: number): LatticeData {
       colors[i * 3] = c.r;
       colors[i * 3 + 1] = c.g;
       colors[i * 3 + 2] = c.b;
-      sizes[i] = 4.2 + seed * 3.2;
+      sizes[i] = 2.4 + seed * 1.8;
     } else {
       const k = (i - coreCount) / Math.max(count - coreCount, 1);
       const t = Math.pow(k, 0.62);
@@ -180,24 +143,6 @@ function makeLattice(count: number): LatticeData {
   }
 
   return { positions, colors, sizes, seeds, coreCount };
-}
-
-function makeGlowTexture() {
-  const canvas = document.createElement("canvas");
-  canvas.width = 512;
-  canvas.height = 512;
-  const ctx = canvas.getContext("2d");
-  if (!ctx) return new THREE.Texture();
-  const g = ctx.createRadialGradient(256, 256, 12, 256, 256, 256);
-  g.addColorStop(0, "rgba(232, 244, 248, 0.95)");
-  g.addColorStop(0.18, "rgba(158, 201, 212, 0.42)");
-  g.addColorStop(0.48, "rgba(158, 201, 212, 0.1)");
-  g.addColorStop(1, "rgba(0, 0, 0, 0)");
-  ctx.fillStyle = g;
-  ctx.fillRect(0, 0, 512, 512);
-  const tex = new THREE.CanvasTexture(canvas);
-  tex.colorSpace = THREE.SRGBColorSpace;
-  return tex;
 }
 
 function buildSynapses(lattice: LatticeData, maxNodes: number, neighbors: number) {
@@ -315,7 +260,7 @@ function Lattice({ lattice }: { lattice: LatticeData }) {
         fragmentShader={fragmentShader}
         transparent
         depthWrite={false}
-        blending={THREE.AdditiveBlending}
+        blending={THREE.NormalBlending}
         vertexColors
         toneMapped={false}
       />
@@ -342,23 +287,8 @@ function Synapses({ lattice, mobile }: { lattice: LatticeData; mobile: boolean }
     g.setAttribute("aSeed", new THREE.BufferAttribute(data.seed, 1));
     return g;
   }, [data]);
-  const sparkGeom = useMemo(() => {
-    const g = new THREE.BufferGeometry();
-    const dummy = new Float32Array(data.pairCount * 3);
-    g.setAttribute("position", new THREE.BufferAttribute(dummy, 3));
-    g.setAttribute("aStart", new THREE.BufferAttribute(data.starts, 3));
-    g.setAttribute("aEnd", new THREE.BufferAttribute(data.ends, 3));
-    g.setAttribute("aSeed", new THREE.BufferAttribute(data.sparkSeed, 1));
-    return g;
-  }, [data]);
 
-  useEffect(
-    () => () => {
-      lineGeom.dispose();
-      sparkGeom.dispose();
-    },
-    [lineGeom, sparkGeom],
-  );
+  useEffect(() => () => lineGeom.dispose(), [lineGeom]);
 
   useFrame((_, dt) => {
     uniforms.uTime.value += dt;
@@ -374,21 +304,10 @@ function Synapses({ lattice, mobile }: { lattice: LatticeData; mobile: boolean }
           fragmentShader={synapseFrag}
           transparent
           depthWrite={false}
-          blending={THREE.AdditiveBlending}
+          blending={THREE.NormalBlending}
           toneMapped={false}
         />
       </lineSegments>
-      <points geometry={sparkGeom} frustumCulled={false}>
-        <shaderMaterial
-          uniforms={uniforms}
-          vertexShader={sparkVert}
-          fragmentShader={sparkFrag}
-          transparent
-          depthWrite={false}
-          blending={THREE.AdditiveBlending}
-          toneMapped={false}
-        />
-      </points>
     </group>
   );
 }
@@ -416,40 +335,6 @@ function Ring({
       <torusGeometry args={[radius, 0.005, 8, 160]} />
       <meshBasicMaterial color="#d7e4ea" transparent opacity={0.2} toneMapped={false} />
     </mesh>
-  );
-}
-
-function BrainCore() {
-  const glow = useMemo(() => makeGlowTexture(), []);
-  const sprite = useRef<THREE.Sprite>(null);
-  const gather = useRef(0);
-
-  useEffect(() => () => glow.dispose(), [glow]);
-
-  useFrame((state, dt) => {
-    const s = sprite.current;
-    if (!s) return;
-    gather.current = Math.min(1, gather.current + Math.min(dt, 0.05) / 2.55);
-    const k = 1 - (1 - gather.current) ** 3;
-    const t = state.clock.elapsedTime;
-    const pulse = 1.05 + Math.sin(t * 0.9) * 0.03;
-    const scale = pulse * (0.2 + 0.35 * k);
-    s.scale.set(scale, scale * 0.92, 1);
-    const mat = s.material as THREE.SpriteMaterial;
-    mat.opacity = 0.12 * k * k;
-  });
-
-  return (
-    <sprite ref={sprite} scale={[2.15, 2, 1]} renderOrder={0}>
-      <spriteMaterial
-        map={glow}
-        transparent
-        depthWrite={false}
-        blending={THREE.AdditiveBlending}
-        opacity={0.12}
-        toneMapped={false}
-      />
-    </sprite>
   );
 }
 
@@ -483,7 +368,6 @@ function World({ mobile }: { mobile: boolean }) {
 
   return (
     <group ref={group}>
-      <BrainCore />
       <Ring radius={1.55} rotation={[Math.PI / 2.3, 0.2, 0]} speed={[0, 0, 0.08]} />
       <Ring radius={2.2} rotation={[0.48, Math.PI / 3.1, 0.12]} speed={[0.035, 0, 0]} />
       <Lattice lattice={lattice} />

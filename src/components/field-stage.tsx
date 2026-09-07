@@ -73,7 +73,7 @@ export function FieldStage() {
         </div>
       </div>
       {live ? (
-        <div ref={fieldRef} className="absolute inset-0 mix-blend-screen">
+        <div ref={fieldRef} className="absolute inset-0">
           <Suspense fallback={null}>
             <NeuralField />
           </Suspense>
