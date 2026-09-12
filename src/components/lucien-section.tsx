@@ -1,7 +1,6 @@
-import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
+import { AgentBrain } from "@/components/agent-brain";
 import { useAppStore } from "@/lib/store";
-import { usePrefersReducedMotion } from "@/lib/utils";
 
 const traits = [
   "Natural conversation in 95+ languages",
@@ -11,41 +10,14 @@ const traits = [
 
 export function LucienSection() {
   const setLucienOpen = useAppStore((s) => s.setLucienOpen);
-  const reduced = usePrefersReducedMotion();
-  const videoRef = useRef<HTMLVideoElement>(null);
-  const [videoOk, setVideoOk] = useState(true);
-
-  useEffect(() => {
-    const el = videoRef.current;
-    if (!el || reduced || !videoOk) return;
-    void el.play().catch(() => setVideoOk(false));
-  }, [reduced, videoOk]);
 
   return (
     <section id="lucien" className="scroll-mt-24">
       <div className="mx-auto grid max-w-6xl md:grid-cols-2">
-        <div className="relative min-h-120 overflow-hidden bg-surface md:min-h-170">
-          <img
-            src="/images/lucien.jpg"
-            alt="Lucien, a glowing digital neural mentor"
-            className="ken absolute inset-0 h-full w-full object-cover"
-          />
-          {!reduced && videoOk ? (
-            <video
-              ref={videoRef}
-              className="absolute inset-0 h-full w-full object-cover"
-              src="/video/lucien.mp4"
-              poster="/images/lucien.jpg"
-              muted
-              loop
-              playsInline
-              preload="metadata"
-              aria-hidden="true"
-              onError={() => setVideoOk(false)}
-            />
-          ) : null}
-          <div className="absolute inset-0 veil-bottom" />
-          <div className="absolute bottom-6 left-6 right-6">
+        <div className="relative min-h-120 overflow-hidden bg-bg md:min-h-170">
+          <AgentBrain id="lucien" className="absolute inset-0 h-full w-full" interactive selected count={7200} />
+          <div className="pointer-events-none absolute inset-0 veil-bottom" />
+          <div className="pointer-events-none absolute bottom-6 left-6 right-6">
             <p className="kicker">Digital neural mentor</p>
             <p className="font-display mt-2 text-3xl text-fg italic">Lucien</p>
           </div>

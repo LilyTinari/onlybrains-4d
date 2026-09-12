@@ -7,8 +7,10 @@ import { useAppStore } from "@/lib/store";
 import { cn } from "@/lib/utils";
 import { useEffect, useState } from "react";
 
-const links = [
+const links: { href: string; label: string; route?: "/bab" | "/dna-molecule" }[] = [
   { href: "#generate", label: "Generate" },
+  { href: "/bab", label: "BAB", route: "/bab" },
+  { href: "/dna-molecule", label: "DNA", route: "/dna-molecule" },
   { href: "#tour", label: "Tour" },
   { href: "#mentors", label: "Mentors" },
   { href: "#journey", label: "HoloTimeline" },
@@ -41,15 +43,25 @@ export function Nav() {
             <Wordmark />
           </Link>
           <nav className="hidden items-center gap-7 lg:flex" aria-label="Primary">
-            {links.map((l) => (
-              <a
-                key={l.href}
-                href={`/${l.href}`}
-                className="text-sm text-muted transition-colors duration-150 hover:text-fg"
-              >
-                {l.label}
-              </a>
-            ))}
+            {links.map((l) =>
+              l.route ? (
+                <Link
+                  key={l.href}
+                  to={l.route}
+                  className="text-sm text-muted transition-colors duration-150 hover:text-fg"
+                >
+                  {l.label}
+                </Link>
+              ) : (
+                <a
+                  key={l.href}
+                  href={`/${l.href}`}
+                  className="text-sm text-muted transition-colors duration-150 hover:text-fg"
+                >
+                  {l.label}
+                </a>
+              ),
+            )}
           </nav>
           <div className="flex items-center gap-2">
             <AuthSlot />
@@ -79,16 +91,27 @@ export function Nav() {
         )}
       >
         <nav className="flex flex-col gap-2" aria-label="Mobile">
-          {links.map((l) => (
-            <a
-              key={l.href}
-              href={`/${l.href}`}
-              onClick={() => setMenuOpen(false)}
-              className="font-display py-3 text-4xl italic"
-            >
-              {l.label}
-            </a>
-          ))}
+          {links.map((l) =>
+            l.route ? (
+              <Link
+                key={l.href}
+                to={l.route}
+                onClick={() => setMenuOpen(false)}
+                className="font-display py-3 text-4xl italic"
+              >
+                {l.label}
+              </Link>
+            ) : (
+              <a
+                key={l.href}
+                href={`/${l.href}`}
+                onClick={() => setMenuOpen(false)}
+                className="font-display py-3 text-4xl italic"
+              >
+                {l.label}
+              </a>
+            ),
+          )}
           <Link
             to="/login"
             onClick={() => setMenuOpen(false)}

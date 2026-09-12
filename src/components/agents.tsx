@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { DigitalBrain } from "@/components/digital-brain";
+import { AgentBrain } from "@/components/agent-brain";
 import { agents } from "@/lib/content";
 import { useAppStore } from "@/lib/store";
 import { cn } from "@/lib/utils";
@@ -29,35 +29,33 @@ export function Agents() {
             <article
               key={a.id}
               className={cn(
-                "rounded-xl bg-surface p-6 ring-1 ring-line",
+                "overflow-hidden rounded-xl bg-surface ring-1 ring-line",
                 a.id === "lucien" && "sm:col-span-2 lg:col-span-1",
               )}
             >
-              <div className="flex items-start justify-between gap-3">
-                {a.id === "lucien" ? (
-                  <img
-                    src="/images/lucien-core.jpg"
-                    alt=""
-                    className="size-14 rounded-full object-cover ring-1 ring-neural/40"
-                  />
-                ) : (
-                  <DigitalBrain className="size-14" />
-                )}
+              <AgentBrain
+                id={a.id}
+                className="aspect-[5/4] w-full"
+                interactive
+                selected
+                count={a.id === "lucien" ? 4200 : 2600}
+              />
+              <div className="p-6">
                 <p className="kicker">{a.domain}</p>
+                <h3 className="font-display mt-3 text-3xl italic tracking-tight text-fg">
+                  {a.name}
+                </h3>
+                <p className="mt-1 text-sm text-fg">{a.role}</p>
+                <p className="mt-3 text-sm leading-relaxed text-muted">{a.copy}</p>
+                <p className="mt-4 text-xs tracking-widest text-subtle uppercase">
+                  {a.epithet}
+                </p>
+                {a.id === "lucien" ? (
+                  <Button size="sm" className="mt-6" onClick={() => setLucienOpen(true)}>
+                    Chat with Lucien
+                  </Button>
+                ) : null}
               </div>
-              <h3 className="font-display mt-6 text-3xl italic tracking-tight text-fg">
-                {a.name}
-              </h3>
-              <p className="mt-1 text-sm text-fg">{a.role}</p>
-              <p className="mt-3 text-sm leading-relaxed text-muted">{a.copy}</p>
-              <p className="mt-4 text-xs tracking-widest text-subtle uppercase">
-                {a.epithet}
-              </p>
-              {a.id === "lucien" ? (
-                <Button size="sm" className="mt-6" onClick={() => setLucienOpen(true)}>
-                  Chat with Lucien
-                </Button>
-              ) : null}
             </article>
           ))}
         </div>

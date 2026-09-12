@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { Agents } from "@/components/agents";
 import { Announce } from "@/components/announce";
+import { BabSection } from "@/components/bab-section";
 import { Closing } from "@/components/closing";
 import { CourseLab } from "@/components/course-lab";
 import { Dust } from "@/components/dust";
@@ -31,6 +32,7 @@ function Home() {
         <div className="relative bg-bg">
           <div className="pointer-events-none absolute inset-x-0 top-0 h-32 -translate-y-full veil-into" />
           <CourseLab />
+          <BabSection />
           <Evidence />
           <Walkthrough />
           <LucienSection />
